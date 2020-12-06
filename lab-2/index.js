@@ -19,10 +19,10 @@ server.post('/login', function(request, result) {
 
 server.get('/send', function(request, result) {
     let template_json = fs.readFileSync('template.json', 'utf-8');
-    let template = JSON.parse(template_json);
-    console.log(template);
+    let template_data = JSON.parse(template_json);
+    console.log(template_data);
 
-    result.render('send');
+    result.render('send', {template : template_data});
 });
 
 server.listen(3000);
