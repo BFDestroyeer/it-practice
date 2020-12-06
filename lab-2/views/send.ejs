@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Передать показания</title>
+    <title>Передать</title>
 </head>
 <body>
     <div>
-        <form name="counter_values">
+        <form method="POST">
             <fieldset>
                 <legend><%=template.name %></legend>
                 <label for="apartment">Квартира:</label>
@@ -19,10 +19,10 @@
                             <% if (key == "name") continue %>
                             <%=key %>: <input type="<%=value %>" name="<%=key %>">
                         <% } %>
-                        
                     </fieldset>
                 <% } %>
             </fieldset>
+            <button type="submit">Отправить</button>
         </form>
     </div>
 </body>
