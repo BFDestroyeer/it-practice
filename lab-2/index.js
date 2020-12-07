@@ -34,8 +34,8 @@ server.post('/send', function(request, result) {
 }) 
 
 server.get('/read', function(request, result) {
-    let results = database.read('root');
-    result.render('read');
+    let base_records = database.read('root');
+    result.render('read', {template : template_data, records : base_records});
 })
 
 server.listen(3000);
