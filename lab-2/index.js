@@ -31,6 +31,7 @@ server.get('/send', function(request, result) {
 
 server.post('/send', function(request, result) {
     console.log(request.body);
+    database.insert(request.body);
 }) 
 
 server.listen(3000);

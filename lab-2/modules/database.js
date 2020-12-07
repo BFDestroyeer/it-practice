@@ -1,3 +1,4 @@
+const { query } = require('express');
 let mysql = require('sync-mysql');
 
 let base = new mysql({
@@ -6,6 +7,8 @@ let base = new mysql({
     password : 'root',
     database : 'data_collection'
 });
+
+let template_data;
 
 module.exports.init =  function() {
     base.query(
@@ -25,17 +28,18 @@ module.exports.init =  function() {
         `CREATE TABLE IF NOT EXISTS record_values (
             record_id INTEGER NOT NULL,
             counter_id INTEGER NOT NULL,
-            value INTEGER
+            value VARCHAR(64)
         )`
     )
 };
 
 module.exports.init_template = function(template) {
+    template_data = template;
     base.query(
         'DELETE FROM counters WHERE id > 0'
     )
     for (let key of Object.keys(template)) {
-        if ((key == 'name') || (key == 'resource')) continue;
+        if ((key == 'name') || (key == 'resources')) continue;
         base.query(
             `INSERT INTO counters SET
                 name = '${key}',
@@ -53,5 +57,27 @@ module.exports.init_template = function(template) {
                 `
             )
         }
+    }
+}
+
+module.exports.insert = function(body) {
+    console.log(body);
+    let counters = base.query(
+        `SELECT * FROM counters`,
+    )
+    base.query(
+        `INSERT INTO records SET
+            user = 'root'
+        `
+    )
+    record_id = base.query(`SELECT LAST_INSERT_ID()`)[0]['LAST_INSERT_ID()'];
+    for (let counter of counters) {
+        let counter_value = body[counter.resource + counter.name];
+        base.query(
+            `INSERT INTO record_values SET
+            record_id = ${record_id},
+            counter_id = ${counter.id},
+            value = '${counter_value}'`
+        )
     }
 }
