@@ -35,9 +35,6 @@ module.exports.init =  function() {
 
 module.exports.init_template = function(template) {
     template_data = template;
-    base.query(
-        'DELETE FROM counters WHERE id > 0'
-    )
     for (let key of Object.keys(template)) {
         if ((key == 'name') || (key == 'resources')) continue;
         base.query(
@@ -61,7 +58,6 @@ module.exports.init_template = function(template) {
 }
 
 module.exports.insert = function(body) {
-    console.log(body);
     let counters = base.query(
         `SELECT * FROM counters`,
     )
@@ -80,4 +76,17 @@ module.exports.insert = function(body) {
             value = '${counter_value}'`
         )
     }
+}
+
+module.exports.read = function(user) {
+    let result = [];
+    let records = base.query(`SELECT id FROM records WHERE user = '${user}'`);
+    for (let record of records) {
+        result.push(
+            base.query(
+                `SELECT value, name, resource FROM record_values INNER JOIN counters ON counter_id = counters.id  WHERE record_id = ${record.id}`
+            )
+        );
+    }
+    return result;
 }
