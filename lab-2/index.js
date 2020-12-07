@@ -1,7 +1,15 @@
 let express = require('express');
-let server = express()
+let server = express();
+let bodyParser = require('body-parser');
+server.use(bodyParser.urlencoded({extended:true}));
 
 let fs = require('fs')
+
+let template_data = JSON.parse(fs.readFileSync('template.json', 'utf-8'));
+
+let database = require('./modules/database');
+database.init();
+database.init_template(template)
 
 server.set('view engine', 'ejs');
 
@@ -18,14 +26,13 @@ server.post('/login', function(request, result) {
 })
 
 server.get('/send', function(request, result) {
-    let template_json = fs.readFileSync('template.json', 'utf-8');
-    let template_data = JSON.parse(template_json);
+    
 
     result.render('send', {template : template_data});
 });
 
 server.post('/send', function(request, result) {
-    
+    console.log(request.body);
 }) 
 
 server.listen(3000);
