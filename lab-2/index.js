@@ -9,7 +9,7 @@ let template_data = JSON.parse(fs.readFileSync('template.json', 'utf-8'));
 
 let database = require('./modules/database');
 database.init();
-database.init_template(template)
+database.init_template(template_data)
 
 server.set('view engine', 'ejs');
 
@@ -26,8 +26,6 @@ server.post('/login', function(request, result) {
 })
 
 server.get('/send', function(request, result) {
-    
-
     result.render('send', {template : template_data});
 });
 

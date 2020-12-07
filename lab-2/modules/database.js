@@ -34,6 +34,15 @@ module.exports.init_template = function(template) {
     base.query(
         'DELETE FROM counters WHERE id > 0'
     )
+    for (let key of Object.keys(template)) {
+        if ((key == 'name') || (key == 'resource')) continue;
+        base.query(
+            `INSERT INTO counters SET
+                name = '${key}',
+                resource = 'main'
+            `
+        )
+    }
     for (let resource of template.resources) {
         for (let counter of Object.keys(resource)) {
             if (counter == 'name') continue;
@@ -41,7 +50,6 @@ module.exports.init_template = function(template) {
                 `INSERT INTO counters SET
                     name = '${counter}',
                     resource = '${resource.name}'
-                    ON DUPLICATE KEY UPDATE id = id
                 `
             )
         }
