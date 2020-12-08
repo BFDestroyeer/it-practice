@@ -23,19 +23,20 @@ server.get('/login', function(request, result) {
 
 server.post('/login', function(request, result) {
     result.redirect('/send');
-})
+});
 
 server.get('/send', function(request, result) {
-    result.render('send', {template : template_data});
+    result.render('send', {template : template_data, counters : database.counters()});
 });
 
 server.post('/send', function(request, result) {
     database.insert(request.body);
-}) 
+    result.redirect('/read');
+});
 
 server.get('/read', function(request, result) {
     let base_records = database.read('root');
     result.render('read', {template : template_data, records : base_records});
-})
+});
 
 server.listen(3000);

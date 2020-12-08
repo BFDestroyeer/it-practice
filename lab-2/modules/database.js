@@ -1,5 +1,6 @@
 const { query } = require('express');
 let mysql = require('sync-mysql');
+let md5 = require('js-md5')
 
 let base = new mysql({
     host     : 'localhost',
@@ -13,8 +14,8 @@ let template_data;
 module.exports.init =  function() {
     base.query(
         `CREATE TABLE IF NOT EXISTS counters (
-            id INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
-            name VARCHAR(64),
+            id       INTEGER AUTO_INCREMENT PRIMARY KEY NOT NULL,
+            name     VARCHAR(64),
             resource VARCHAR(64)
         )`
     );
@@ -26,9 +27,15 @@ module.exports.init =  function() {
     );
     base.query(
         `CREATE TABLE IF NOT EXISTS record_values (
-            record_id INTEGER NOT NULL,
+            record_id  INTEGER NOT NULL,
             counter_id INTEGER NOT NULL,
-            value VARCHAR(64)
+            value      VARCHAR(64)
+        )`
+    )
+    base.query(
+        `CREATE TABLE IF NOT EXISTS users (
+            name     VARCHAR(64) PRIMARY KEY NOT NULL,
+            password VARCHAR(64) NOT NULL
         )`
     )
 };
@@ -49,7 +56,7 @@ module.exports.init_template = function(template) {
             if (counter == 'name') continue;
             base.query(
                 `INSERT INTO counters SET
-                    name = '${counter}',
+                    name     = '${counter}',
                     resource = '${resource.name}'
                 `
             )
@@ -57,23 +64,24 @@ module.exports.init_template = function(template) {
     }
 }
 
-module.exports.insert = function(body) {
-    let counters = base.query(
-        `SELECT * FROM counters`,
-    )
+module.exports.counters = function() {
+    return base.query(`SELECT * FROM counters`);
+}
+
+module.exports.insert = function(values) {
     base.query(
         `INSERT INTO records SET
             user = 'root'
         `
     )
     record_id = base.query(`SELECT LAST_INSERT_ID()`)[0]['LAST_INSERT_ID()'];
-    for (let counter of counters) {
-        let counter_value = body[counter.resource + counter.name];
+    for (let [key, value] of Object.entries(values)) {
         base.query(
             `INSERT INTO record_values SET
-            record_id = ${record_id},
-            counter_id = ${counter.id},
-            value = '${counter_value}'`
+                record_id  = ${record_id},
+                counter_id = ${key},
+                value      = '${value}'
+            `
         )
     }
 }
@@ -84,7 +92,11 @@ module.exports.read = function(user) {
     for (let record of records) {
         result.push(
             base.query(
-                `SELECT value, name, resource FROM record_values INNER JOIN counters ON counter_id = counters.id  WHERE record_id = ${record.id}`
+                `SELECT value, name, resource
+                    FROM record_values
+                    INNER JOIN counters ON counter_id = counters.id
+                    WHERE record_id = ${record.id}
+                `
             )
         );
     }

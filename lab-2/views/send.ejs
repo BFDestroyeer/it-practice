@@ -12,14 +12,14 @@
                 <legend><%=template.name %></legend>
                 <% for (let [key, value] of Object.entries(template)) { %>
                     <% if ((key == 'name') || (key == 'resources')) continue %>
-                    <%=key %>: <input type="<%=value %>" name="main<%=key %>">
+                    <%=key %>: <input type="<%=value %>" name="<%= counters.find(val => val['name'] == key && val['resource'] == 'main')['id'] %>">
                 <% } %>
                 <% for(let resource of template.resources) { %>
                     <fieldset>
                         <legend><%=resource.name %></legend>
                         <% for (let [key, value] of Object.entries(resource)) { %>
                             <% if (key == "name") continue %>
-                            <%=key %>: <input type="<%=value %>" name="<%=resource.name %><%=key %>">
+                            <%=key %>: <input type="<%=value %>" name="<%= counters.find(val => val['name'] == key && val['resource'] == resource.name)['id'] %>">
                         <% } %>
                     </fieldset>
                 <% } %>
