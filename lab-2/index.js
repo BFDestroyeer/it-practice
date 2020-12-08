@@ -2,6 +2,7 @@ let express = require('express');
 let server = express();
 let bodyParser = require('body-parser');
 server.use(bodyParser.urlencoded({extended:true}));
+server.use(express.static('public'));
 
 let fs = require('fs')
 

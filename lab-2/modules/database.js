@@ -1,6 +1,5 @@
 const { query } = require('express');
 let mysql = require('sync-mysql');
-let md5 = require('js-md5')
 
 let base = new mysql({
     host     : 'localhost',
