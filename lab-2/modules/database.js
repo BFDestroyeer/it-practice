@@ -31,34 +31,18 @@ module.exports.init =  function() {
             value      VARCHAR(64)
         )`
     )
-    base.query(
-        `CREATE TABLE IF NOT EXISTS users (
-            name     VARCHAR(64) PRIMARY KEY NOT NULL,
-            password VARCHAR(64) NOT NULL
-        )`
-    )
 };
 
 module.exports.init_template = function(template) {
     template_data = template;
     for (let key of Object.keys(template)) {
         if ((key == 'name') || (key == 'resources')) continue;
-        base.query(
-            `INSERT INTO counters SET
-                name = '${key}',
-                resource = 'main'
-            `
-        )
+        base.query(`INSERT INTO counters SET name = ?, resource = 'main'`, [key]);
     }
     for (let resource of template.resources) {
         for (let counter of Object.keys(resource)) {
             if (counter == 'name') continue;
-            base.query(
-                `INSERT INTO counters SET
-                    name     = '${counter}',
-                    resource = '${resource.name}'
-                `
-            )
+            base.query(`INSERT INTO counters SET name = ?, resource = ?'`, [counter, resource.name]);
         }
     }
 }
@@ -68,34 +52,24 @@ module.exports.counters = function() {
 }
 
 module.exports.insert = function(values) {
-    base.query(
-        `INSERT INTO records SET
-            user = 'root'
-        `
-    )
+    base.query(`INSERT INTO records SET user = 'root'`)
     record_id = base.query(`SELECT LAST_INSERT_ID()`)[0]['LAST_INSERT_ID()'];
     for (let [key, value] of Object.entries(values)) {
-        base.query(
-            `INSERT INTO record_values SET
-                record_id  = ${record_id},
-                counter_id = ${key},
-                value      = '${value}'
-            `
-        )
+        base.query(`INSERT INTO record_values SET record_id = ?, counter_id = ?, value = ?`, [record_id, key, value]);
     }
 }
 
 module.exports.read = function(user) {
     let result = [];
-    let records = base.query(`SELECT id FROM records WHERE user = '${user}'`);
+    let records = base.query(`SELECT id FROM records WHERE user = ?`, [user]);
     for (let record of records) {
         result.push(
             base.query(
                 `SELECT value, name, resource
                     FROM record_values
                     INNER JOIN counters ON counter_id = counters.id
-                    WHERE record_id = ${record.id}
-                `
+                    WHERE record_id = ?
+                `, [record.id]
             )
         );
     }
