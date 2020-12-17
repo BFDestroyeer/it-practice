@@ -34,6 +34,9 @@ module.exports.init =  function() {
 };
 
 module.exports.init_template = function(template) {
+    if (base.query('SELECT count(*) FROM counters')[0]['count(*)'] != 0) {
+        return;
+    }
     template_data = template;
     for (let key of Object.keys(template)) {
         if ((key == 'name') || (key == 'resources')) continue;
@@ -42,7 +45,7 @@ module.exports.init_template = function(template) {
     for (let resource of template.resources) {
         for (let counter of Object.keys(resource)) {
             if (counter == 'name') continue;
-            base.query(`INSERT INTO counters SET name = ?, resource = ?'`, [counter, resource.name]);
+            base.query(`INSERT INTO counters SET name = ?, resource = ?`, [counter, resource.name]);
         }
     }
 }

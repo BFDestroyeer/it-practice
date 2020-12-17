@@ -10,7 +10,7 @@ let template_data = JSON.parse(fs.readFileSync('template.json', 'utf-8'));
 
 let database = require('./modules/database');
 database.init();
-//database.init_template(template_data)
+database.init_template(template_data)
 
 server.set('view engine', 'ejs');
 
