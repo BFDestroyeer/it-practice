@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Передать</title>
+    <link href="./css/style.css" rel="stylesheet" />
+</head>
+<body>
+    <%- include('navigation') %>
+    <div>
+        <form method="POST">
+            <fieldset>
+                <legend><%=template.name %></legend>
+                <% for (let [key, value] of Object.entries(template)) { %>
+                    <% if ((key == 'name') || (key == 'resources')) continue %>
+                    <%=key %>: <input type="<%=value %>" name="<%= counters.find(val => val['name'] == key && val['resource'] == 'main')['id'] %>">
+                <% } %>
+                <% for(let resource of template.resources) { %>
+                    <fieldset>
+                        <legend><%=resource.name %></legend>
+                        <% for (let [key, value] of Object.entries(resource)) { %>
+                            <% if (key == "name") continue %>
+                            <%=key %>: <input type="<%=value %>" name="<%= counters.find(val => val['name'] == key && val['resource'] == resource.name)['id'] %>">
+                        <% } %>
+                    </fieldset>
+                <% } %>
+            </fieldset>
+            <button type="submit">Отправить</button>
+        </form>
+    </div>
+    <%- include('footer') %>
+</body>
+</html>
